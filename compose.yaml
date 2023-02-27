@@ -1,0 +1,48 @@
+services:
+  xtina-web:
+    image: node:lts
+    working_dir: /var/www/html/app
+    volumes:
+      - ./WEB:/var/www/html/app
+    restart: always
+    container_name: xtina-web
+    command: bash -c "npm ci && npm run dev"
+    tty: true
+    ports:
+      - 80:80
+  xtina-api:
+    build: 
+      context: ./docker_configs
+      dockerfile: Dockerfile
+    volumes:
+      - ./API/src:/var/www/html
+    restart: always
+    container_name: xtina-api
+    ports:
+      - 81:8080
+    depends_on: 
+      - xtina-db
+    networks:
+      - my-network
+  xtina-db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    container_name: xtina-db
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: xtina_webapp
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    #volumes:
+    #  - db_data:/var/lib/mysql
+    #  - db_data/logs/mysql:/var/log/mysql
+    networks:
+      - my-network
+volumes:
+  src:
+networks:
+  my-network:
+    driver: bridge
