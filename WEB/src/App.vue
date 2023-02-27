@@ -8,13 +8,13 @@ import useEventBus from './composables/eventBus';
 import { useRightDrawerStore } from './stores/rightDrawer.js'
 import TheRightSideDrawer from './components/TheRightSideDrawer.vue'
 
-const navigation = ref(false)
+const navigationMenu = ref(false)
 const snackbar = useSnackbar()
 const {bus} = useEventBus()
 const rightDrawer = useRightDrawerStore()
 
-function changeNavigation(){
-  navigation.value = !navigation.value
+function changeNavigationMenu(){
+  navigationMenu.value = !navigationMenu.value
 }
 
 watch(()=>bus.value.get('triggerToast'), (val)=>{
@@ -26,15 +26,16 @@ function closeRightDrawer(){
   rightDrawer.close()
 }
 
+
 </script>
 
 <template>
   <VApp>
-    <TheHeader @navigationChange="changeNavigation"></TheHeader>
+    <TheHeader @navigationMenuChange="changeNavigationMenu"></TheHeader>
     <teleport to="body">
         <vue3-snackbar top right :duration="2300"></vue3-snackbar>
     </teleport>
-    <TheLeftSideNavigation @navigationClosed="navigation = false" :navigation="navigation"></TheLeftSideNavigation>
+    <TheLeftSideNavigation @navigationMenuClosed="navigationMenu = false" :navigationMenu="navigationMenu"></TheLeftSideNavigation>
     <TheMainContent></TheMainContent>
     <TheRightSideDrawer @right-drawer-closed="closeRightDrawer" :open="rightDrawer.isOpen" :data="rightDrawer.data"></TheRightSideDrawer>
   </VApp>

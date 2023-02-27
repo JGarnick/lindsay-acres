@@ -1,10 +1,9 @@
 <script setup>
-    import {ref, reactive} from 'vue'
-    import API from '@/services/api.js'
-    import {useUsersStore} from '../stores/users.js'
-    import Cookies from 'js-cookie'
+    import { ref, reactive } from 'vue'
+    import { useUsersStore } from '../stores/users.js'
+    import { login, register } from "../services/auth"
 
-    let store = useUsersStore()
+    let usersStore = useUsersStore()
     let dialog = ref(false)
     let showPassword = ref(false)
     let loginData = reactive({password: "", email: ""})
@@ -23,33 +22,29 @@
         }
     })
 
-    async function login(){
+    async function attemptLogin(){
         Object.assign(validationErrors.login, {
             "email": [],
             "password":[]
         })
-        let result = await API.post("auth/login", loginData)
+        let result = login(loginData, usersStore)
         if (result.message === "validation error") {
             setFormErrors(result, "login")
         }
-        if (result.success) {
-            Cookies.set("token", result.token, {expires:1})
-            store.user = result.user
-            step.value = "login-complete"
-            setTimeout(() => {
-                dialog.value = false
-            }, 1000);
-        }
+
+        dialog.value = false
     }
 
-    async function register(){
+    async function attemptRegister(){
         Object.assign(validationErrors.register, {
             "email": [],
             "password":[],
             "password_confirmation":[],
             "name": []
         })
-        let result = await API.post("auth/register", registerData)
+
+        let result = register(registerData)
+        
         if (result.message === "validation error") {
             setFormErrors(result, "register")
         }
@@ -95,9 +90,6 @@
                 </v-card-title>
                 <v-window v-model="step">
                     <v-card-text>
-                        <v-window-item :value="'login-complete'">
-                            <span class="h5">Login Successful!</span>
-                        </v-window-item>
                         <v-window-item :value="'login'">
                             <v-form
                             @submit.prevent
@@ -136,7 +128,6 @@
                         <v-window-item :value="'register'">
                             <v-form
                             @submit.prevent
-                            ref="registerForm"
                             lazy-validation
                             >
                                 <v-row>
@@ -208,7 +199,7 @@
                         <v-btn
                             color="blue-darken-1"
                             variant="text"
-                            @click="login"
+                            @click="attemptLogin"
                         >
                             Login
                         </v-btn>
@@ -220,7 +211,7 @@
                         <v-btn
                             color="primary"
                             variant="text"
-                            @click="register"
+                            @click="attemptRegister"
                         >
                             Register
                         </v-btn>

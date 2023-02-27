@@ -2,8 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import API from "../services/api"
 import Cookies from "js-cookie"
 
-const token = Cookies.get("token")
-
 const routes = [
     {
         name: "Dashboard", 
@@ -21,16 +19,16 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from)=>{
+router.beforeEach(async (to, from)=>{
     if (Cookies.get("isAuthenticated") === undefined) {
         Cookies.set("isAuthenticated", false)
     }
     //If user is unauthenticated but there is a token
-    if (Cookies.get("isAuthenticated") === 'false' && Cookies.get("token") !== undefined) {
-        // API.get("auth/user")
-        
+    if (Cookies.get("isAuthenticated") === 'false' && Cookies.get("token") !== undefined && Cookies.get("user") === undefined) {
+        let {user} = await API.get("auth/user")
+        Cookies.set("user", JSON.stringify(user))
+        Cookies.set("isAuthenticated", "true")
     }
-    
 })
 
 export default router

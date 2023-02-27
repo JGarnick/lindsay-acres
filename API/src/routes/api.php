@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\AuthController;
 Route::prefix("auth")->group(function(){
     Route::post('/register', [AuthController::class, 'createUser']);
     Route::post('/login', [AuthController::class, 'loginUser']);
+    Route::post('/logout', [AuthController::class, 'logoutUser']);
 });
 
 Route::middleware('auth:sanctum')->group(function(){

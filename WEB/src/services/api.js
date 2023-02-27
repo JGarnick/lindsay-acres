@@ -31,7 +31,8 @@ const API = class{
                 });
                 
             emit("triggerToast", {type: 'success', text: response_data.message})
-            return response_data.data;
+            
+            return response_data;
         }catch(error){
             emit("triggerToast", {type: 'error', text: 'There was a problem fetching the Entities'})
         }
